@@ -69,17 +69,6 @@ showRoundToDialog(BuildContext context, double roundValue) async {
               children: [
                 RadioListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('0 KG'),
-                  value: 0.0,
-                  groupValue: currentRoundValue,
-                  onChanged: (double? value) {
-                    setState(() {
-                      currentRoundValue = value ?? 0;
-                    });
-                  },
-                ),
-                RadioListTile(
-                  contentPadding: EdgeInsets.zero,
                   title: const Text('2.5 KG'),
                   value: 2.5,
                   groupValue: currentRoundValue,
