@@ -36,6 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, roundWeightStatus, roundWeightValue, _) => Center(
               child: Scaffold(
                 appBar: AppBar(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   title: Text(widget.title),
                   actions: [
                     IconButton(
@@ -113,6 +115,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             if (_formKey.currentState!.validate()) {
                               var weightValue = int.parse(weight.text);
                               var repsValue = int.parse(reps.text);
+                              if (repsValue > 6) {
+                                const textSnackbar = SnackBar(
+                                  content: Text("Calculations are more accurate in 1-6 rep range"),
+                                );
+
+                                ScaffoldMessenger.of(context).showSnackBar(textSnackbar);
+                              }
 
                               double max = weightValue / (1.0278 - (0.0278 * repsValue));
                               if (roundWeightStatus.getRoundStatus()) {
@@ -127,14 +136,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           },
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                              side: const BorderSide(color: Colors.black)),
+                            borderRadius: BorderRadius.circular(5.0),
+                            side: BorderSide(color: Theme.of(context).colorScheme.secondary),
+                          ),
                           elevation: 5.0,
                           child: const Text('Calculate',
-                              style: TextStyle(fontSize: 20, color: Colors.black)),
+                              style: TextStyle(
+                                fontSize: 20,
+                              )),
                         ),
                         SizedBox(height: 30),
-                        Text('$res KG', style: const TextStyle(fontSize: 48, color: Colors.black)),
+                        Text(res == '1RM' ? res : '$res KG',
+                            style: const TextStyle(
+                              fontSize: 48,
+                            )),
                       ],
                     ),
                   ),
