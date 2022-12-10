@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.one_rep_max_calc">
    <application
-        android:label="one_rep_max_calc"
+        android:label="1RM Calculator"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
