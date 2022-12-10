@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../service/round_to_service.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -29,93 +32,115 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpaceSides = 2;
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-          child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 100,
-            ),
-            Row(
-              children: [
-                Expanded(flex: flexSpaceSides, child: const SizedBox()),
-                Expanded(
-                  flex: flexTextFeild,
-                  child: SizedBox(
-                    width: width * 0.3,
-                    height: 80,
-                    child: TextFormField(
-                      validator: weightValidator,
-                      controller: weight,
-                      obscureText: false,
-                      decoration: const InputDecoration(
-                        hintText: "Weight",
-                        border: OutlineInputBorder(),
-                        errorStyle: TextStyle(height: 0.5),
-                      ),
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
+    return Consumer2<RoundNotifier, RoundValueNotifier>(
+        builder: (context, roundWeightStatus, roundWeightValue, _) => Center(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.title),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      tooltip: 'Settings',
+                      onPressed: () {
+                        weight.clear();
+                        reps.clear();
+                        res = '1RM';
+                        Navigator.pushNamed(context, '/settings');
+                        FocusScope.of(context).unfocus();
+                      },
                     ),
-                  ),
+                  ],
                 ),
-                Expanded(flex: flexSpacebetween, child: const SizedBox()),
-                Expanded(
-                  flex: flexTextFeild,
-                  child: SizedBox(
-                    width: width * 0.3,
-                    height: 80,
-                    child: TextFormField(
-                      validator: repsValidator,
-                      controller: reps,
-                      obscureText: false,
-                      decoration: const InputDecoration(
-                        hintText: "Reps",
-                        border: OutlineInputBorder(),
-                        errorStyle: TextStyle(height: 0.5),
-                      ),
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                Expanded(flex: flexSpaceSides, child: const SizedBox()),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            MaterialButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                if (_formKey.currentState!.validate()) {
-                  var weightValue = int.parse(weight.text);
-                  var repsValue = int.parse(reps.text);
+                body: Center(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 150,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(flex: flexSpaceSides, child: const SizedBox()),
+                            Expanded(
+                              flex: flexTextFeild,
+                              child: SizedBox(
+                                width: width * 0.3,
+                                height: 80,
+                                child: TextFormField(
+                                  validator: weightValidator,
+                                  controller: weight,
+                                  obscureText: false,
+                                  decoration: const InputDecoration(
+                                    hintText: "Weight",
+                                    border: OutlineInputBorder(),
+                                    errorStyle: TextStyle(height: 0.5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            Expanded(flex: flexSpacebetween, child: const SizedBox()),
+                            Expanded(
+                              flex: flexTextFeild,
+                              child: SizedBox(
+                                width: width * 0.3,
+                                height: 80,
+                                child: TextFormField(
+                                  validator: repsValidator,
+                                  controller: reps,
+                                  obscureText: false,
+                                  decoration: const InputDecoration(
+                                    hintText: "Reps",
+                                    border: OutlineInputBorder(),
+                                    errorStyle: TextStyle(height: 0.5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            Expanded(flex: flexSpaceSides, child: const SizedBox()),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        MaterialButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            if (_formKey.currentState!.validate()) {
+                              var weightValue = int.parse(weight.text);
+                              var repsValue = int.parse(reps.text);
 
-                  double max = weightValue / (1.0278 - (0.0278 * repsValue));
-                  max = roundToNearest(max, 2.5);
-                  var maxString = max.toString();
-                  var maxStringNum = maxString.split('.')[0];
-                  var maxStringFractions = maxString.split('.')[1].substring(0, 1);
-                  res = '$maxStringNum.$maxStringFractions';
-                }
-              },
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                  side: const BorderSide(color: Colors.black)),
-              elevation: 5.0,
-              child: const Text('Calculate', style: TextStyle(fontSize: 20, color: Colors.black)),
-            ),
-            SizedBox(height: 30),
-            Text(res, style: const TextStyle(fontSize: 48, color: Colors.black)),
-          ],
-        ),
-      )),
-    );
+                              double max = weightValue / (1.0278 - (0.0278 * repsValue));
+                              if (roundWeightStatus.getRoundStatus()) {
+                                var roundValue = roundWeightValue.getRoundValue();
+                                max = roundToNearest(max, roundValue);
+                              }
+
+                              var maxString = max.toString();
+                              var maxStringNum = maxString.split('.')[0];
+                              var maxStringFractions = maxString.split('.')[1].substring(0, 1);
+                              res = '$maxStringNum.$maxStringFractions';
+                            }
+                          },
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                              side: const BorderSide(color: Colors.black)),
+                          elevation: 5.0,
+                          child: const Text('Calculate',
+                              style: TextStyle(fontSize: 20, color: Colors.black)),
+                        ),
+                        SizedBox(height: 30),
+                        Text('$res KG', style: const TextStyle(fontSize: 48, color: Colors.black)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ));
   }
 
   String? weightValidator(String? value) {
