@@ -9,7 +9,7 @@ class RoundNotifier with ChangeNotifier {
 
   RoundNotifier() {
     StorageManager.readData('roundStatus').then((value) {
-      _roundStatus = value;
+      _roundStatus = value ?? false;
       notifyListeners();
     });
   }
@@ -28,7 +28,7 @@ class RoundValueNotifier with ChangeNotifier {
 
   RoundValueNotifier() {
     StorageManager.readData('roundValue').then((value) {
-      _roundValue = value;
+      _roundValue = value ?? 2.5;
       notifyListeners();
     });
   }
