@@ -11,7 +11,7 @@ class ThemeNotifier with ChangeNotifier {
     brightness: Brightness.dark,
     backgroundColor: const Color(0xFF212121),
     dividerColor: Colors.black12,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blueGrey).copyWith(
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.teal).copyWith(
       secondary: Colors.white,
       brightness: Brightness.dark,
     ),
