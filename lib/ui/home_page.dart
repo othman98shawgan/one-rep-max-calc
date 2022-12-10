@@ -36,8 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, roundWeightStatus, roundWeightValue, _) => Center(
               child: Scaffold(
                 appBar: AppBar(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
                   title: Text(widget.title),
                   actions: [
                     IconButton(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/resources/colors.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -35,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(widget.title),
           ),
           body: SettingsList(
+            lightTheme: const SettingsThemeData(settingsListBackground: backgroudColor),
             sections: [
               SettingsSection(
                 title: const Text('General'),
