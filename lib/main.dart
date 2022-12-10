@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
               initialRoute: '/home',
               routes: {
                 '/home': (context) => const MyHomePage(
-                      title: '1RM',
+                      title: '1RM Calculator',
                     ),
                 '/settings': (context) => const SettingsPage(
                       title: 'Settings',
