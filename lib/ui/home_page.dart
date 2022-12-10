@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         const SizedBox(
                           height: 20,
                         ),
-                        MaterialButton(
+                        ElevatedButton(
                           onPressed: () {
                             FocusScope.of(context).unfocus();
                             if (_formKey.currentState!.validate()) {
@@ -133,11 +133,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               res = '$maxStringNum.$maxStringFractions';
                             }
                           },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                            side: BorderSide(color: Theme.of(context).colorScheme.secondary),
-                          ),
-                          elevation: 5.0,
                           child: const Text('Calculate',
                               style: TextStyle(
                                 fontSize: 20,
