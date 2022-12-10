@@ -29,6 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Height (without status and toolbar)
     double height3 = height - padding.top - kToolbarHeight;
+
     var flexSpaceSides = 2;
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
@@ -72,6 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   controller: weight,
                                   obscureText: false,
                                   decoration: const InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.blueGrey,
+                                      ),
+                                    ),
                                     hintText: "Weight",
                                     border: OutlineInputBorder(),
                                     errorStyle: TextStyle(height: 0.5),
@@ -92,6 +98,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   controller: reps,
                                   obscureText: false,
                                   decoration: const InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.blueGrey,
+                                      ),
+                                    ),
                                     hintText: "Reps",
                                     border: OutlineInputBorder(),
                                     errorStyle: TextStyle(height: 0.5),
@@ -108,37 +119,43 @@ class _MyHomePageState extends State<MyHomePage> {
                           height: 20,
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            FocusScope.of(context).unfocus();
-                            if (_formKey.currentState!.validate()) {
-                              var weightValue = int.parse(weight.text);
-                              var repsValue = int.parse(reps.text);
-                              if (repsValue > 6) {
-                                const textSnackbar = SnackBar(
-                                  content: Text("Calculations are more accurate in 1-6 rep range"),
-                                );
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueGrey,
+                            ),
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              if (_formKey.currentState!.validate()) {
+                                var weightValue = int.parse(weight.text);
+                                var repsValue = int.parse(reps.text);
+                                if (repsValue > 6) {
+                                  const textSnackbar = SnackBar(
+                                    content:
+                                        Text("Calculations are more accurate in 1-6 rep range"),
+                                  );
 
-                                ScaffoldMessenger.of(context).showSnackBar(textSnackbar);
+                                  ScaffoldMessenger.of(context).showSnackBar(textSnackbar);
+                                }
+
+                                double max = weightValue / (1.0278 - (0.0278 * repsValue));
+                                if (roundWeightStatus.getRoundStatus()) {
+                                  var roundValue = roundWeightValue.getRoundValue();
+                                  max = roundToNearest(max, roundValue);
+                                }
+
+                                var maxString = max.toString();
+                                var maxStringNum = maxString.split('.')[0];
+                                var maxStringFractions = maxString.split('.')[1].substring(0, 1);
+                                res = '$maxStringNum.$maxStringFractions';
                               }
-
-                              double max = weightValue / (1.0278 - (0.0278 * repsValue));
-                              if (roundWeightStatus.getRoundStatus()) {
-                                var roundValue = roundWeightValue.getRoundValue();
-                                max = roundToNearest(max, roundValue);
-                              }
-
-                              var maxString = max.toString();
-                              var maxStringNum = maxString.split('.')[0];
-                              var maxStringFractions = maxString.split('.')[1].substring(0, 1);
-                              res = '$maxStringNum.$maxStringFractions';
-                            }
-                          },
-                          child: const Text('Calculate',
-                              style: TextStyle(
-                                fontSize: 20,
-                              )),
-                        ),
-                        SizedBox(height: 30),
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text('Calculate',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                  )),
+                            )),
+                        const SizedBox(height: 30),
                         Text(res == '1RM' ? res : '$res KG',
                             style: const TextStyle(
                               fontSize: 48,

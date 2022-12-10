@@ -11,7 +11,8 @@ class ThemeNotifier with ChangeNotifier {
     brightness: Brightness.dark,
     backgroundColor: const Color(0xFF212121),
     dividerColor: Colors.black12,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.teal).copyWith(
+    focusColor: darkThemeSwatch,
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: darkThemeSwatch).copyWith(
       secondary: Colors.white,
       brightness: Brightness.dark,
     ),
@@ -25,7 +26,8 @@ class ThemeNotifier with ChangeNotifier {
     dialogBackgroundColor: backgroudColor,
     // elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(color)),
     dividerColor: Colors.white54,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blueGrey).copyWith(
+    focusColor: lightThemeSwatch,
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: lightThemeSwatch).copyWith(
       secondary: Colors.black,
       brightness: Brightness.light,
     ),
