@@ -19,6 +19,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String res = "1RM";
 
   @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Full screen width and height
     double width = MediaQuery.of(context).size.width;
@@ -33,9 +38,11 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpaceSides = 2;
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
+
     return Consumer2<RoundNotifier, RoundValueNotifier>(
         builder: (context, roundWeightStatus, roundWeightValue, _) => Center(
               child: Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: AppBar(
                   title: Text(widget.title),
                   actions: [
@@ -43,11 +50,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       icon: const Icon(Icons.settings),
                       tooltip: 'Settings',
                       onPressed: () {
-                        weight.clear();
-                        reps.clear();
-                        res = '1RM';
-                        Navigator.pushNamed(context, '/settings');
-                        FocusScope.of(context).unfocus();
+                        Navigator.pushNamed(context, '/settings').then((value) {
+                          setState(() {
+                            res = '1RM';
+                          });
+                          weight.clear();
+                          reps.clear();
+                          FocusScope.of(context).unfocus();
+                        });
                       },
                     ),
                   ],
@@ -56,19 +66,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      // mainAxisSize: MainAxisSize.min, //So elements be in Center
                       children: [
-                        const SizedBox(
-                          height: 150,
-                        ),
+                        SizedBox(height: height3 * 0.15),
                         Row(
                           children: [
                             Expanded(flex: flexSpaceSides, child: const SizedBox()),
                             Expanded(
                               flex: flexTextFeild,
                               child: SizedBox(
-                                width: width * 0.3,
                                 height: 80,
                                 child: TextFormField(
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                  ),
                                   validator: weightValidator,
                                   controller: weight,
                                   obscureText: false,
@@ -91,9 +102,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             Expanded(
                               flex: flexTextFeild,
                               child: SizedBox(
-                                width: width * 0.3,
                                 height: 80,
                                 child: TextFormField(
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                  ),
                                   validator: repsValidator,
                                   controller: reps,
                                   obscureText: false,
@@ -105,7 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                     hintText: "Reps",
                                     border: OutlineInputBorder(),
-                                    errorStyle: TextStyle(height: 0.5),
+                                    errorStyle: TextStyle(
+                                      height: 0.5,
+                                    ),
                                   ),
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
@@ -115,9 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Expanded(flex: flexSpaceSides, child: const SizedBox()),
                           ],
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: height3 * 0.05),
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueGrey,
@@ -155,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontSize: 24,
                                   )),
                             )),
-                        const SizedBox(height: 30),
+                        SizedBox(height: height3 * 0.075),
                         Text(res == '1RM' ? res : '$res KG',
                             style: const TextStyle(
                               fontSize: 48,
