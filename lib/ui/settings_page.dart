@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:one_rep_max_calc/resources/colors.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
+import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-
-import '../service/store_manager.dart';
 import '../service/theme_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -19,18 +18,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    // Full screen width and height
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    // Height (without SafeArea)
-    var padding = MediaQuery.of(context).viewPadding;
-
-    // Height (without status and toolbar)
-    double height3 = height - padding.top - kToolbarHeight;
-
-    return Consumer3<ThemeNotifier, RoundNotifier, RoundValueNotifier>(
-      builder: (context, theme, roundWeightStatus, roundWeightValue, child) => Center(
+    return Consumer4<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier>(
+      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, child) => Center(
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
@@ -53,6 +42,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                     },
                   ),
+                  SettingsTile.navigation(
+                    leading: const Icon(Icons.monitor_weight),
+                    title: const Text('Unit'),
+                    value: Text(unitProvider.unitDesc),
+                    trailing: const Icon(Icons.navigate_next),
+                    onPressed: (context) {
+                      showUnitDialog(context, unitProvider.unit);
+                    },
+                  ),
                 ],
               ),
               SettingsSection(
@@ -70,7 +68,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     enabled: roundWeightStatus.getRoundStatus(),
                     leading: const Icon(Icons.onetwothree),
                     title: const Text('Round to nearest'),
-                    value: Text('${roundWeightValue.getRoundValue()} Kg'),
+                    value: Text('${roundWeightValue.getRoundValue()} ${unitProvider.unit}'),
+                    trailing: const Icon(Icons.navigate_next),
                     onPressed: (context) {
                       showRoundToDialog(context, roundWeightValue.getRoundValue());
                     },
