@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'round_to_service.dart';
 import 'store_manager.dart';
 
 class UnitNotifier with ChangeNotifier {
@@ -39,8 +40,10 @@ showUnitDialog(BuildContext context, String unit) async {
     Navigator.pop(context);
     if (currentUnit == 'KGS') {
       Provider.of<UnitNotifier>(context, listen: false).setKGS();
+      Provider.of<RoundValueNotifier>(context, listen: false).convertToKgs();
     } else {
       Provider.of<UnitNotifier>(context, listen: false).setLBS();
+      Provider.of<RoundValueNotifier>(context, listen: false).convertToLbs();
     }
   });
 

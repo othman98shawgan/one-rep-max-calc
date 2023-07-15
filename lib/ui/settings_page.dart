@@ -68,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     enabled: roundWeightStatus.getRoundStatus(),
                     leading: const Icon(Icons.onetwothree),
                     title: const Text('Round to nearest'),
-                    value: Text('${roundWeightValue.getRoundValue()} Kg'),
+                    value: Text('${roundWeightValue.getRoundValue()} ${unitProvider.unit}'),
                     trailing: const Icon(Icons.navigate_next),
                     onPressed: (context) {
                       showRoundToDialog(context, roundWeightValue.getRoundValue());
