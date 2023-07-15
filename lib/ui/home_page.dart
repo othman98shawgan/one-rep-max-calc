@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 
 import '../service/round_to_service.dart';
@@ -39,8 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
 
-    return Consumer2<RoundNotifier, RoundValueNotifier>(
-        builder: (context, roundWeightStatus, roundWeightValue, _) => Center(
+    return Consumer3<RoundNotifier, RoundValueNotifier, UnitNotifier>(
+        builder: (context, roundWeightStatus, roundWeightValue, unitProvider, _) => Center(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 appBar: AppBar(
@@ -169,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   )),
                             )),
                         SizedBox(height: height3 * 0.075),
-                        Text(res == '1RM' ? res : '$res KG',
+                        Text(res == '1RM' ? res : '$res ${unitProvider.unit}',
                             style: const TextStyle(
                               fontSize: 48,
                             )),

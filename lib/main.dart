@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
+import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:one_rep_max_calc/ui/settings_page.dart';
 
 import 'service/theme_service.dart';
@@ -11,6 +12,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeNotifier()),
+        ChangeNotifierProvider(create: (context) => UnitNotifier()),
         ChangeNotifierProvider(create: (context) => RoundNotifier()),
         ChangeNotifierProvider(create: (context) => RoundValueNotifier()),
       ],
