@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
+import 'package:in_app_update/in_app_update.dart';
 
+import '../service/utils.dart';
 import '../service/round_to_service.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -22,6 +24,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void setState(VoidCallback fn) {
     super.setState(fn);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkForUpdate();
   }
 
   @override
@@ -199,5 +207,23 @@ class _MyHomePageState extends State<MyHomePage> {
     var roundTo = 1 / roundFactor;
     var val = (num * roundTo).round() / roundTo;
     return val;
+  }
+
+  Future<void> checkForUpdate() async {
+    InAppUpdate.checkForUpdate().then((info) {
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        InAppUpdate.startFlexibleUpdate().then((_) {
+          InAppUpdate.completeFlexibleUpdate().then((_) {
+            printSnackBar("Success!", context);
+          }).catchError((e) {
+            printSnackBar(e.toString(), context);
+          });
+        }).catchError((e) {
+          printSnackBar(e.toString(), context);
+        });
+      }
+    }).catchError((e) {
+      printSnackBar(e.toString(), context);
+    });
   }
 }
