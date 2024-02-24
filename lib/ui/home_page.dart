@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:wakelock/wakelock.dart';
 
 import '../service/utils.dart';
 import '../service/round_to_service.dart';
@@ -29,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     checkForUpdate();
   }
 
@@ -47,8 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
 
-    return Consumer3<RoundNotifier, RoundValueNotifier, UnitNotifier>(
-        builder: (context, roundWeightStatus, roundWeightValue, unitProvider, _) => Center(
+    return Consumer4<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier>(
+        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, child) =>
+            Center(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 appBar: AppBar(
@@ -177,10 +181,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   )),
                             )),
                         SizedBox(height: height3 * 0.075),
-                        Text(res == '1RM' ? res : '$res ${unitProvider.unit}',
-                            style: const TextStyle(
-                              fontSize: 48,
-                            )),
+                        Text(
+                          res == '1RM' ? res : '$res ${unitProvider.unit}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 48),
+                        ),
                       ],
                     ),
                   ),

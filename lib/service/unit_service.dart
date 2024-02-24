@@ -4,10 +4,10 @@ import 'round_to_service.dart';
 import 'store_manager.dart';
 
 class UnitNotifier with ChangeNotifier {
-  String _unit = 'KGS';
+  String _unit = '';
   String get unit => _unit;
 
-  String _unitDesc = 'KGS - Kilograms';
+  String _unitDesc = '';
   String get unitDesc => _unitDesc;
 
   UnitNotifier() {
