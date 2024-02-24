@@ -66,10 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           setState(() {
                             res = '1RM';
                           });
-                          weight.clear();
-                          reps.clear();
-                          FocusScope.of(context).unfocus();
+                          FocusManager.instance.primaryFocus?.unfocus();
                         });
+                        weight.clear();
+                        reps.clear();
                       },
                     ),
                   ],
