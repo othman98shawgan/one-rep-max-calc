@@ -1,6 +1,6 @@
 # Miscellaneous
 *.class
-pubspec.lock
+*.lock
 *.log
 *.pyc
 *.swp
@@ -45,4 +45,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-pubspec.lock
