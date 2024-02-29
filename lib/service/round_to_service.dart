@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 
 import 'store_manager.dart';
@@ -38,10 +39,23 @@ class RoundValueNotifier with ChangeNotifier {
     StorageManager.saveData('roundValue', value);
     notifyListeners();
   }
+
+  void convertToKgs() async {
+    _roundValue /= 2;
+    StorageManager.saveData('roundValue', _roundValue);
+    notifyListeners();
+  }
+
+  void convertToLbs() async {
+    _roundValue *= 2;
+    StorageManager.saveData('roundValue', _roundValue);
+    notifyListeners();
+  }
 }
 
 showRoundToDialog(BuildContext context, double roundValue) async {
   var currentRoundValue = roundValue;
+  var isKg = Provider.of<UnitNotifier>(context, listen: false).unit == 'KGS';
 
   var confirmMethod = (() {
     Navigator.pop(context);
@@ -50,8 +64,7 @@ showRoundToDialog(BuildContext context, double roundValue) async {
 
   AlertDialog alert = AlertDialog(
       title: const Text("Round Weights to"),
-      // titlePadding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 0),
-      contentPadding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 24.0),
+      contentPadding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 8.0),
       actions: [
         ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
         TextButton(
@@ -60,17 +73,19 @@ showRoundToDialog(BuildContext context, double roundValue) async {
         ),
       ],
       content: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-        // currentRoundValue = RoundNotifier().getRoundValue();
         return Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 20.0),
+            padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 RadioListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('2.5 KG'),
-                  value: 2.5,
+                  visualDensity: const VisualDensity(
+                      horizontal: VisualDensity.minimumDensity,
+                      vertical: VisualDensity.minimumDensity),
+                  title: isKg ? const Text('2.5 KG') : const Text('5.0 LBS'),
+                  value: isKg ? 2.5 : 5.0,
                   groupValue: currentRoundValue,
                   onChanged: (double? value) {
                     setState(() {
@@ -80,8 +95,11 @@ showRoundToDialog(BuildContext context, double roundValue) async {
                 ),
                 RadioListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('5.0 KG'),
-                  value: 5.0,
+                  visualDensity: const VisualDensity(
+                      horizontal: VisualDensity.minimumDensity,
+                      vertical: VisualDensity.minimumDensity),
+                  title: isKg ? const Text('5.0 KG') : const Text('10.0 LBS'),
+                  value: isKg ? 5.0 : 10.0,
                   groupValue: currentRoundValue,
                   onChanged: (double? value) {
                     setState(() {
