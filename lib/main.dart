@@ -3,6 +3,7 @@ import 'package:one_rep_max_calc/service/round_to_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:one_rep_max_calc/ui/settings_page.dart';
 
+import 'service/formula_service.dart';
 import 'service/store_manager.dart';
 import 'service/theme_service.dart';
 import 'ui/home_page.dart';
@@ -25,6 +26,7 @@ void main() {
           ChangeNotifierProvider(create: (context) => UnitNotifier()),
           ChangeNotifierProvider(create: (context) => RoundNotifier()),
           ChangeNotifierProvider(create: (context) => RoundValueNotifier()),
+          ChangeNotifierProvider(create: (context) => FormulaNotifier()),
         ],
         child: const MyApp(),
       ),
