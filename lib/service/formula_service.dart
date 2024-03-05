@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'store_manager.dart';
@@ -47,6 +49,19 @@ const formulaDescription = {
   Formula.lander: '(100 × weight) / (101.3 - 2.67123 × reps)',
   Formula.lombardi: 'weight × reps ^ 0.1',
 };
+
+double calculate1RM(double weight, int reps, Formula formula) {
+  switch (formula) {
+    case Formula.brzycki:
+      return weight * (36 / (37 - reps));
+    case Formula.epley:
+      return weight * (1 + (0.0333 * reps));
+    case Formula.lander:
+      return (100 * weight) / (101.3 - (2.67123 * reps));
+    case Formula.lombardi:
+      return weight * pow(reps, 0.1);
+  }
+}
 
 showFormulaDialog(BuildContext context, Formula formula) async {
   Formula? currentFormula = formula;
