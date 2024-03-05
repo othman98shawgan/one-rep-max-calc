@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +18,11 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer4<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier>(
-      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, child) => Center(
+    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier,
+        FormulaNotifier>(
+      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider,
+              child) =>
+          Center(
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
@@ -70,6 +74,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     trailing: const Icon(Icons.navigate_next),
                     onPressed: (context) {
                       showRoundToDialog(context, roundWeightValue.getRoundValue());
+                    },
+                  ),
+                  SettingsTile.navigation(
+                    leading: const Icon(Icons.functions),
+                    title: const Text('Calculation formula'),
+                    value: Text('${formulaNames[formulaProvider.formula]}'),
+                    trailing: const Icon(Icons.navigate_next),
+                    onPressed: (context) {
+                      showFormulaDialog(context, formulaProvider.formula!);
                     },
                   ),
                 ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
@@ -50,9 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
 
-    return Consumer4<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier>(
-        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, child) =>
-            Center(
+    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier>(
+        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider, child) => Center(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 appBar: AppBar(
@@ -150,18 +150,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               FocusScope.of(context).unfocus();
                               if (_formKey.currentState!.validate()) {
-                                var weightValue = int.parse(weight.text);
+                                var weightValue = double.parse(weight.text);
                                 var repsValue = int.parse(reps.text);
                                 if (repsValue > 6) {
-                                  const textSnackbar = SnackBar(
-                                    content:
-                                        Text("Calculations are more accurate in 1-6 rep range"),
-                                  );
-
-                                  ScaffoldMessenger.of(context).showSnackBar(textSnackbar);
+                                  printSnackBar("Calculations are more accurate in 1-6 rep range", context);
                                 }
 
-                                double max = weightValue / (1.0278 - (0.0278 * repsValue));
+                                double max = calculate1RM(weightValue, repsValue, formulaProvider.formula!);
+
                                 if (roundWeightStatus.getRoundStatus()) {
                                   var roundValue = roundWeightValue.getRoundValue();
                                   max = roundToNearest(max, roundValue);
