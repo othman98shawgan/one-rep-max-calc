@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
@@ -50,8 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
 
-    return Consumer4<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier>(
-        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, child) =>
+    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier,
+            FormulaNotifier>(
+        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider,
+                formulaProvider, child) =>
             Center(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -161,7 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ScaffoldMessenger.of(context).showSnackBar(textSnackbar);
                                 }
 
-                                double max = weightValue / (1.0278 - (0.0278 * repsValue));
+                                double max = maxCalc(weightValue, repsValue);
+
                                 if (roundWeightStatus.getRoundStatus()) {
                                   var roundValue = roundWeightValue.getRoundValue();
                                   max = roundToNearest(max, roundValue);
@@ -191,6 +195,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ));
+  }
+
+  double maxCalc(int weightValue, int repsValue) {
+    return weightValue / (1.0278 - (0.0278 * repsValue));
   }
 
   String? weightValidator(String? value) {
