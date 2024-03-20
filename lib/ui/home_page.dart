@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
@@ -22,6 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController weight = TextEditingController(text: "");
   final TextEditingController reps = TextEditingController(text: "");
   final _formKey = GlobalKey<FormState>();
+  final InAppReview inAppReview = InAppReview.instance;
   String res = "1RM";
 
   @override
@@ -34,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     Wakelock.enable();
     checkForUpdate();
+    checkForReview();
   }
 
   @override
@@ -224,6 +227,14 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }).catchError((e) {
       printSnackBar(e.toString(), context);
+    });
+  }
+
+  Future<void> checkForReview() async {
+    inAppReview.isAvailable().then((isAvailable) {
+      if (isAvailable) {
+        inAppReview.requestReview();
+      }
     });
   }
 }
