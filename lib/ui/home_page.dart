@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/theme_service.dart';
@@ -33,7 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     Wakelock.enable();
-    checkForUpdate();
+    if (!kDebugMode) {
+      checkForUpdate();
+    }
   }
 
   @override
@@ -214,16 +217,24 @@ class _MyHomePageState extends State<MyHomePage> {
       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
         InAppUpdate.startFlexibleUpdate().then((_) {
           InAppUpdate.completeFlexibleUpdate().then((_) {
-            printSnackBar("Success!", context);
+            if (kDebugMode) {
+              printSnackBar("Success!", context);
+            }
           }).catchError((e) {
-            printSnackBar(e.toString(), context);
+            if (kDebugMode) {
+              printSnackBar(e.toString(), context);
+            }
           });
         }).catchError((e) {
-          printSnackBar(e.toString(), context);
+          if (kDebugMode) {
+            printSnackBar(e.toString(), context);
+          }
         });
       }
     }).catchError((e) {
-      printSnackBar(e.toString(), context);
+      if (kDebugMode) {
+        printSnackBar(e.toString(), context);
+      }
     });
   }
 }
