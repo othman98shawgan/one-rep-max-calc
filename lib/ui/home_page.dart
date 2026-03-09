@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_review/in_app_review.dart';
+
 import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../service/utils.dart';
 import '../service/round_to_service.dart';
@@ -23,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController weight = TextEditingController(text: "");
   final TextEditingController reps = TextEditingController(text: "");
   final _formKey = GlobalKey<FormState>();
+  final InAppReview inAppReview = InAppReview.instance;
   String res = "1RM";
 
   @override
@@ -33,9 +36,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Wakelock.enable();
+    WakelockPlus.enable();
     if (!kDebugMode) {
       checkForUpdate();
+      checkForReview();
     }
   }
 
@@ -234,6 +238,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }).catchError((e) {
       if (kDebugMode) {
         printSnackBar(e.toString(), context);
+      }
+    });
+  }
+
+  Future<void> checkForReview() async {
+    inAppReview.isAvailable().then((isAvailable) {
+      if (isAvailable) {
+        inAppReview.requestReview();
       }
     });
   }
