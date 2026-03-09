@@ -21,7 +21,6 @@ dependencies:
   wakelock_plus: ^1.2.8 
   in_app_review: ^2.0.8
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
