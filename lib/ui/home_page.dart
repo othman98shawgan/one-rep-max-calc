@@ -7,7 +7,7 @@ import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../service/utils.dart';
 import '../service/round_to_service.dart';
@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Wakelock.enable();
+    WakelockPlus.enable();
     if (!kDebugMode) {
       checkForUpdate();
       checkForReview();
