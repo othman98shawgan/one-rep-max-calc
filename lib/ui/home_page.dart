@@ -5,8 +5,9 @@ import 'package:one_rep_max_calc/service/theme_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../service/calculator_provider.dart';
 import '../service/utils.dart';
 import '../service/round_to_service.dart';
 
@@ -26,14 +27,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String res = "1RM";
 
   @override
-  void setState(VoidCallback fn) {
-    super.setState(fn);
-  }
-
-  @override
   void initState() {
     super.initState();
-    Wakelock.enable();
+    WakelockPlus.enable();
     if (!kDebugMode) {
       checkForUpdate();
     }
@@ -54,8 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
     var flexSpacebetween = 1;
     var flexTextFeild = 3;
 
-    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier>(
-        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider, child) => Center(
+    return Consumer6<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier,
+            CalculatorProvider>(
+        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider,
+                calculatorProvider, child) =>
+            Center(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 appBar: AppBar(
@@ -66,9 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       tooltip: 'Settings',
                       onPressed: () {
                         Navigator.pushNamed(context, '/settings').then((value) {
-                          setState(() {
-                            res = '1RM';
-                          });
+                          calculatorProvider.reset();
                           FocusManager.instance.primaryFocus?.unfocus();
                         });
                         weight.clear();
@@ -155,21 +152,19 @@ class _MyHomePageState extends State<MyHomePage> {
                               if (_formKey.currentState!.validate()) {
                                 var weightValue = double.parse(weight.text);
                                 var repsValue = int.parse(reps.text);
+
+                                // Keep the UI logic (SnackBar) in the UI
                                 if (repsValue > 6) {
                                   printSnackBar("Calculations are more accurate in 1-6 rep range", context);
                                 }
 
-                                double max = calculate1RM(weightValue, repsValue, formulaProvider.formula!);
-
-                                if (roundWeightStatus.getRoundStatus()) {
-                                  var roundValue = roundWeightValue.getRoundValue();
-                                  max = roundToNearest(max, roundValue);
-                                }
-
-                                var maxString = max.toString();
-                                var maxStringNum = maxString.split('.')[0];
-                                var maxStringFractions = maxString.split('.')[1].substring(0, 1);
-                                res = '$maxStringNum.$maxStringFractions';
+                                // Send the math to the logic layer
+                                Provider.of<CalculatorProvider>(context, listen: false).calculate(
+                                    weightValue,
+                                    repsValue,
+                                    formulaProvider.formula!,
+                                    roundWeightStatus.getRoundStatus(),
+                                    roundWeightValue.getRoundValue());
                               }
                             },
                             child: const Padding(
@@ -181,7 +176,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                         SizedBox(height: height3 * 0.075),
                         Text(
-                          res == '1RM' ? res : '$res ${unitProvider.unit}',
+                          calculatorProvider.estimatedMax == '1RM'
+                              ? calculatorProvider.estimatedMax
+                              : '${calculatorProvider.estimatedMax} ${unitProvider.unit}',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 48),
                         ),
                       ],
@@ -204,12 +201,6 @@ class _MyHomePageState extends State<MyHomePage> {
       return 'Missing value';
     }
     return null;
-  }
-
-  double roundToNearest(double num, double roundFactor) {
-    var roundTo = 1 / roundFactor;
-    var val = (num * roundTo).round() / roundTo;
-    return val;
   }
 
   Future<void> checkForUpdate() async {
