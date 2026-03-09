@@ -35,8 +35,8 @@ class ThemeNotifier with ChangeNotifier {
 
   //*** Dark Theme ***/
   final darkTheme = ThemeData(
-    appBarTheme:
-        const AppBarTheme(backgroundColor: Color(0xff2C363F), foregroundColor: Colors.white),
+    useMaterial3: true,
+    appBarTheme: const AppBarTheme(backgroundColor: Color(0xff2C363F), foregroundColor: Colors.white),
     primaryColor: Colors.black,
     brightness: Brightness.dark,
     dividerColor: Colors.black12,
@@ -52,6 +52,7 @@ class ThemeNotifier with ChangeNotifier {
 
   //*** Light Theme ***/
   final lightTheme = ThemeData(
+    useMaterial3: true,
     appBarTheme: const AppBarTheme(backgroundColor: appBarColor, foregroundColor: Colors.white),
     primaryColor: Colors.white,
     brightness: Brightness.light,
