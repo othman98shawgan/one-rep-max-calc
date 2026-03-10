@@ -33,37 +33,51 @@ class ThemeNotifier with ChangeNotifier {
   // Themes
   //=============================================================================
 
-  //*** Dark Theme ***/
+//*** Dark Theme ***/
   final darkTheme = ThemeData(
+    brightness: Brightness.dark, // <--- THIS FIXES THE WHITE SCREEN
     useMaterial3: true,
-    appBarTheme: const AppBarTheme(backgroundColor: Color(0xff2C363F), foregroundColor: Colors.white),
-    primaryColor: Colors.black,
-    brightness: Brightness.dark,
-    dividerColor: Colors.black12,
-    snackBarTheme: const SnackBarThemeData(
-      contentTextStyle: TextStyle(color: Colors.white),
-    ),
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: darkThemeSwatch).copyWith(
-      secondary: Colors.white,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.teal,
       brightness: Brightness.dark,
-      background: const Color(0xFF212121),
+      surface: const Color(0xFF1E1E1E),
+      onSurface: Colors.white,
     ),
+    scaffoldBackgroundColor: const Color(0xFF121212),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xff2C363F),
+      foregroundColor: Colors.white,
+      centerTitle: true,
+      elevation: 0,
+    ),
+    listTileTheme: const ListTileThemeData(
+      textColor: Colors.white,
+      iconColor: Colors.white70,
+    ),
+    dividerColor: Colors.white10,
   );
 
   //*** Light Theme ***/
   final lightTheme = ThemeData(
+    brightness: Brightness.light, // <--- ADDED HERE TOO
     useMaterial3: true,
-    appBarTheme: const AppBarTheme(backgroundColor: appBarColor, foregroundColor: Colors.white),
-    primaryColor: Colors.white,
-    brightness: Brightness.light,
-    scaffoldBackgroundColor: backgroudColor,
-    dialogBackgroundColor: backgroudColor,
-    // elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(color)),
-    dividerColor: Colors.white54,
-    focusColor: lightThemeSwatch,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: lightThemeSwatch).copyWith(
-      secondary: Colors.black,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blueGrey,
       brightness: Brightness.light,
+      surface: const Color(0xFFF7F9F2),
+      onSurface: const Color(0xff2C363F),
     ),
+    scaffoldBackgroundColor: const Color(0xFFD6DBD2),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xff2C363F),
+      foregroundColor: Colors.white,
+      centerTitle: true,
+      elevation: 0,
+    ),
+    listTileTheme: const ListTileThemeData(
+      textColor: Color(0xff2C363F),
+      iconColor: Color(0xff2C363F),
+    ),
+    dividerColor: Colors.black12,
   );
 }

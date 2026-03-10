@@ -3,7 +3,6 @@ import 'package:one_rep_max_calc/service/formula_service.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
-import 'package:settings_ui/settings_ui.dart';
 import '../service/theme_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -17,79 +16,181 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   @override
+  @override
   Widget build(BuildContext context) {
-    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier,
-        FormulaNotifier>(
-      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider,
-              child) =>
-          Center(
-        child: Scaffold(
+    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier>(
+      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider, child) {
+        bool isDark = Theme.of(context).brightness == Brightness.dark;
+        Color surfaceColor = Theme.of(context).colorScheme.surface;
+        Color dividerColor = Theme.of(context).dividerColor;
+        Color textColor = Theme.of(context).colorScheme.onSurface;
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            title: Text(widget.title),
+            title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
           ),
-          body: SettingsList(
-            sections: [
-              SettingsSection(
-                title: const Text('General'),
-                tiles: [
-                  SettingsTile.switchTile(
-                    title: const Text('Dark Mode'),
-                    leading: const Icon(Icons.dark_mode_outlined),
-                    initialValue: theme.getTheme() == theme.darkTheme,
-                    onToggle: (value) {
-                      if (value) {
-                        theme.setDarkMode();
-                      } else {
-                        theme.setLightMode();
-                      }
-                    },
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.monitor_weight),
-                    title: const Text('Unit'),
-                    value: Text(unitProvider.unitDesc),
-                    trailing: const Icon(Icons.navigate_next),
-                    onPressed: (context) {
-                      showUnitDialog(context, unitProvider.unit);
-                    },
-                  ),
-                ],
+          body: ListView(
+            padding: const EdgeInsets.all(24.0),
+            children: [
+              // --- GENERAL SECTION ---
+              const Text(
+                "GENERAL",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey),
               ),
-              SettingsSection(
-                title: const Text('Calculation'),
-                tiles: <SettingsTile>[
-                  SettingsTile.switchTile(
-                    title: const Text('Round Weights'),
-                    leading: const Icon(Icons.calculate),
-                    initialValue: roundWeightStatus.getRoundStatus(),
-                    onToggle: (value) {
-                      roundWeightStatus.setStatus(value);
-                    },
-                  ),
-                  SettingsTile.navigation(
-                    enabled: roundWeightStatus.getRoundStatus(),
-                    leading: const Icon(Icons.onetwothree),
-                    title: const Text('Round to nearest'),
-                    value: Text('${roundWeightValue.getRoundValue()} ${unitProvider.unit}'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onPressed: (context) {
-                      showRoundToDialog(context, roundWeightValue.getRoundValue());
-                    },
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.functions),
-                    title: const Text('Calculation formula'),
-                    value: Text('${formulaNames[formulaProvider.formula]}'),
-                    trailing: const Icon(Icons.navigate_next),
-                    onPressed: (context) {
-                      showFormulaDialog(context, formulaProvider.formula!);
-                    },
-                  ),
-                ],
+              const SizedBox(height: 16),
+
+              Container(
+                decoration: BoxDecoration(color: surfaceColor, borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      title: Text("Dark Theme", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                      secondary: Icon(Icons.dark_mode_outlined, color: textColor),
+                      value: isDark,
+                      inactiveThumbColor: Colors.grey.shade400,
+                      inactiveTrackColor: isDark ? Colors.white24 : Colors.black12,
+                      trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+                      activeColor: isDark ? Colors.teal : const Color(0xff2C363F),
+                      onChanged: (value) {
+                        if (value) {
+                          theme.setDarkMode();
+                        } else {
+                          theme.setLightMode();
+                        }
+                      },
+                    ),
+                    Divider(height: 1, color: dividerColor),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.monitor_weight_outlined, color: textColor),
+                              const SizedBox(width: 16),
+                              Text("Weight Unit",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor)),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 140,
+                            child: _buildUnitToggle(context, unitProvider, roundWeightValue, isDark),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // --- CALCULATION SECTION ---
+              const Text(
+                "CALCULATION",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+
+              Container(
+                decoration: BoxDecoration(color: surfaceColor, borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      title: Text("Round Weights", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                      secondary: Icon(Icons.calculate_outlined, color: textColor),
+                      value: roundWeightStatus.getRoundStatus(),
+                      activeColor: isDark ? Colors.teal : const Color(0xff2C363F),
+                      inactiveThumbColor: Colors.grey.shade400,
+                      inactiveTrackColor: isDark ? Colors.white24 : Colors.black12,
+                      trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+                      onChanged: (value) {
+                        roundWeightStatus.setStatus(value);
+                      },
+                    ),
+                    Divider(height: 1, color: dividerColor),
+                    ListTile(
+                      enabled: roundWeightStatus.getRoundStatus(),
+                      leading: Icon(Icons.tune, color: textColor),
+                      title: Text('Round to nearest', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('${roundWeightValue.getRoundValue()} ${unitProvider.unit}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                          const Icon(Icons.navigate_next, color: Colors.grey),
+                        ],
+                      ),
+                      onTap: () => showRoundToDialog(context, roundWeightValue.getRoundValue()),
+                    ),
+                    Divider(height: 1, color: dividerColor),
+                    ListTile(
+                      leading: Icon(Icons.functions, color: textColor),
+                      title:
+                          Text('Calculation formula', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('${formulaNames[formulaProvider.formula]}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                          const Icon(Icons.navigate_next, color: Colors.grey),
+                        ],
+                      ),
+                      onTap: () => showFormulaDialog(context, formulaProvider.formula!),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
+        );
+      },
+    );
+  } // The custom segmented toggle adapted for KGS/LBS
+
+  Widget _buildUnitToggle(
+      BuildContext context, UnitNotifier unitProvider, RoundValueNotifier roundValueNotifier, bool isDark) {
+    const Color activeColor = Color(0xFF2C363F);
+    Color bgColor = isDark ? Colors.black26 : Colors.grey.shade200;
+
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12)),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: ['KGS', 'LBS'].map((unit) {
+          final isSelected = unitProvider.unit == unit;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (unit == 'KGS' && unitProvider.unit != 'KGS') {
+                  unitProvider.setKGS();
+                  roundValueNotifier.convertToKgs();
+                } else if (unit == 'LBS' && unitProvider.unit != 'LBS') {
+                  unitProvider.setLBS();
+                  roundValueNotifier.convertToLbs();
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isSelected ? (isDark ? Colors.teal : activeColor) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  unit,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: isSelected ? Colors.white : Colors.grey.shade600,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
