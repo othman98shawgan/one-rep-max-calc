@@ -5,6 +5,7 @@ import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:one_rep_max_calc/ui/settings_page.dart';
 
 import 'service/formula_service.dart';
+import 'service/plate_provider.dart';
 import 'service/store_manager.dart';
 import 'service/theme_service.dart';
 import 'ui/home_page.dart';
@@ -29,6 +30,7 @@ void main() {
           ChangeNotifierProvider(create: (context) => RoundValueNotifier()),
           ChangeNotifierProvider(create: (context) => FormulaNotifier()),
           ChangeNotifierProvider(create: (context) => CalculatorProvider()),
+          ChangeNotifierProvider(create: (context) => PlateProvider()),
         ],
         child: const MyApp(),
       ),

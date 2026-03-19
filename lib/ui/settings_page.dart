@@ -98,6 +98,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 decoration: BoxDecoration(color: surfaceColor, borderRadius: BorderRadius.circular(16)),
                 child: Column(
                   children: [
+                    ListTile(
+                      leading: Icon(Icons.fitness_center, color: textColor),
+                      title: Text('Barbell & Plates Inventory',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+                      subtitle: Text('Bar: 20 KGS • 6 Plate Types',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                      trailing: const Icon(Icons.navigate_next, color: Colors.grey),
+                      onTap: () {
+                        // We will build this screen next
+                        // Navigator.pushNamed(context, '/inventory');
+                      },
+                    ),
+                    Divider(height: 1, color: dividerColor),
                     SwitchListTile(
                       title: Text("Round Weights", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
                       secondary: Icon(Icons.calculate_outlined, color: textColor),

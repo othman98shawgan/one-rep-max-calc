@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:one_rep_max_calc/resources/colors.dart';
 import 'store_manager.dart';
 
 class ThemeNotifier with ChangeNotifier {

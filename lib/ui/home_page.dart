@@ -1,21 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:in_app_review/in_app_review.dart';
-
-import 'package:one_rep_max_calc/service/formula_service.dart';
-import 'package:one_rep_max_calc/service/theme_service.dart';
-import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../service/calculator_provider.dart';
-import '../service/utils.dart';
+import '../service/formula_service.dart';
+import '../service/plate_provider.dart';
 import '../service/round_to_service.dart';
+import '../service/unit_service.dart';
+import '../service/utils.dart';
+import '../service/app_services.dart';
+import 'widgets/barbell_visualizer.dart';
+import 'widgets/result_card.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -26,44 +23,37 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController weight = TextEditingController(text: "");
   final TextEditingController reps = TextEditingController(text: "");
   final _formKey = GlobalKey<FormState>();
-  final InAppReview inAppReview = InAppReview.instance;
 
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable();
-    if (!kDebugMode) {
-      checkForUpdate();
-      checkForReview();
-    }
+    // All that messy store logic is now a single, clean line.
+    AppServices.initializeAppServices(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer5<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier>(
-      builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider, child) {
-        final calculatorProvider = Provider.of<CalculatorProvider>(context);
-
-        // Exact Hex Colors from your Stitch HTML
-        const Color appBarColor = Color(0xFF2C363F);
-        const Color scaffoldColor = Color(0xFFD6DBD2);
-        const Color m3SurfaceColor = Color(0xFFF7F9F2);
-        const Color inputBottomBorder = Color(0xFF4A5568);
+    return Consumer3<RoundNotifier, RoundValueNotifier, UnitNotifier>(
+      builder: (context, roundWeightStatus, roundWeightValue, unitProvider, child) {
+        final calculatorProvider = Provider.of<CalculatorProvider>(context, listen: false);
+        final formulaProvider = Provider.of<FormulaNotifier>(context, listen: false);
+        final plateProvider = Provider.of<PlateProvider>(context, listen: false);
 
         return Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: appBarColor,
+            backgroundColor: const Color(0xFF2C363F),
             foregroundColor: Colors.white,
-            elevation: 4, // Shadow-md
+            elevation: 4,
             title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
             actions: [
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/settings').then((value) {
+                  Navigator.pushNamed(context, '/settings').then((_) {
                     calculatorProvider.reset();
+                    plateProvider.reset();
                     FocusManager.instance.primaryFocus?.unfocus();
                   });
                   weight.clear();
@@ -74,83 +64,29 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0), // py-10 px-6
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // --- THE INPUTS (Labels Above) ---
+                    // --- THE INPUTS ---
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Weight (${unitProvider.unit.toLowerCase()})",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: weight,
-                                validator: weightValidator,
-                                keyboardType: TextInputType.number,
-                                style: const TextStyle(fontSize: 18),
-                                decoration: InputDecoration(
-                                  hintText: "0",
-                                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
-                                  filled: true,
-                                  fillColor: Theme.of(context).colorScheme.surface, // bg-black/5
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // h-14 px-4
-                                  enabledBorder: const UnderlineInputBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                                    borderSide: BorderSide(color: inputBottomBorder, width: 2),
-                                  ),
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                                    borderSide: BorderSide(color: appBarColor, width: 2),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: _buildInputField(
+                            controller: weight,
+                            label: "Weight (${unitProvider.unit.toLowerCase()})",
+                            validator: (v) => v == null || v.isEmpty ? 'Missing value' : null,
                           ),
                         ),
-                        const SizedBox(width: 16), // gap-4
+                        const SizedBox(width: 16),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Reps",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7))),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: reps,
-                                validator: repsValidator,
-                                keyboardType: TextInputType.number,
-                                style: const TextStyle(fontSize: 18),
-                                decoration: InputDecoration(
-                                  hintText: "0",
-                                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
-                                  filled: true,
-                                  fillColor: Theme.of(context).colorScheme.surface,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                  enabledBorder: const UnderlineInputBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                                    borderSide: BorderSide(color: inputBottomBorder, width: 2),
-                                  ),
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                                    borderSide: BorderSide(color: appBarColor, width: 2),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: _buildInputField(
+                            controller: reps,
+                            label: "Reps",
+                            validator: (v) => v == null || v.isEmpty ? 'Missing value' : null,
                           ),
                         ),
                       ],
@@ -159,14 +95,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     // --- THE BUTTON ---
                     SizedBox(
-                      width: 320, // max-w-xs
-                      height: 56, // h-14
+                      width: 320,
+                      height: 56,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primary,
                           foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          elevation: 8, // shadow-lg
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)), // rounded-full
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                         ),
                         onPressed: () {
                           FocusScope.of(context).unfocus();
@@ -178,62 +114,24 @@ class _MyHomePageState extends State<MyHomePage> {
                               printSnackBar("Calculations are more accurate in 1-6 rep range", context);
                             }
 
+                            // 1. Calculate the Max
                             calculatorProvider.calculate(weightValue, repsValue, formulaProvider.formula!,
                                 roundWeightStatus.getRoundStatus(), roundWeightValue.getRoundValue());
+
+                            // 2. Load the Barbell
+                            double finalMax = double.parse(calculatorProvider.estimatedMax);
+                            plateProvider.calculatePlates(finalMax, unitProvider.unit);
                           }
                         },
                         child: const Text('Calculate', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(height: 24), // mt-4 approx
+                    const SizedBox(height: 24),
 
-                    // --- THE RESULT CARD ---
-                    Container(
-                      width: double.infinity,
-                      constraints: const BoxConstraints(minHeight: 200), // min-h-[200px]
-                      padding: const EdgeInsets.all(32), // p-8
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(24), // rounded-3xl
-                        border: Border.all(color: Colors.grey.shade200), // border border-gray-200
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1)) // shadow-sm
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'ESTIMATED 1RM',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                              letterSpacing: 2.0, // tracking-widest
-                            ),
-                          ),
-                          const SizedBox(height: 8), // mb-2
-                          Text(
-                            calculatorProvider.estimatedMax == '1RM' ? '0' : calculatorProvider.estimatedMax,
-                            style: TextStyle(
-                              fontSize: 72, // text-7xl
-                              fontWeight: FontWeight.w900, // font-black
-                              color: Theme.of(context).colorScheme.onSurface,
-                              height: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 8), // mt-2
-                          Text(
-                            'Using ${formulaNames[formulaProvider.formula]} formula',
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // --- EXTRACTED COMPONENTS ---
+                    const ResultCard(),
                     const SizedBox(height: 32),
+                    const BarbellVisualizer(),
                   ],
                 ),
               ),
@@ -244,51 +142,46 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  String? weightValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Missing value';
-    }
-    return null;
-  }
-
-  String? repsValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Missing value';
-    }
-    return null;
-  }
-
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-        InAppUpdate.startFlexibleUpdate().then((_) {
-          InAppUpdate.completeFlexibleUpdate().then((_) {
-            if (kDebugMode) {
-              printSnackBar("Success!", context);
-            }
-          }).catchError((e) {
-            if (kDebugMode) {
-              printSnackBar(e.toString(), context);
-            }
-          });
-        }).catchError((e) {
-          if (kDebugMode) {
-            printSnackBar(e.toString(), context);
-          }
-        });
-      }
-    }).catchError((e) {
-      if (kDebugMode) {
-        printSnackBar(e.toString(), context);
-      }
-    });
-  }
-
-  Future<void> checkForReview() async {
-    inAppReview.isAvailable().then((isAvailable) {
-      if (isAvailable) {
-        inAppReview.requestReview();
-      }
-    });
+  // A clean helper method for the repetitive TextFormField code
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String? Function(String?) validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(fontSize: 18),
+          decoration: InputDecoration(
+            hintText: "0",
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            enabledBorder: const UnderlineInputBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+              borderSide: BorderSide(color: Color(0xFF4A5568), width: 2),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+              borderSide: BorderSide(color: Color(0xFF2C363F), width: 2),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
