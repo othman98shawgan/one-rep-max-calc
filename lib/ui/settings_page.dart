@@ -106,8 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                       trailing: const Icon(Icons.navigate_next, color: Colors.grey),
                       onTap: () {
-                        // We will build this screen next
-                        // Navigator.pushNamed(context, '/inventory');
+                        Navigator.pushNamed(context, '/inventory');
                       },
                     ),
                     Divider(height: 1, color: dividerColor),

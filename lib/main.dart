@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:one_rep_max_calc/service/calculator_provider.dart';
 import 'package:one_rep_max_calc/service/round_to_service.dart';
 import 'package:one_rep_max_calc/service/unit_service.dart';
+import 'package:one_rep_max_calc/ui/inventory_page.dart';
 import 'package:one_rep_max_calc/ui/settings_page.dart';
 
 import 'service/formula_service.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
               routes: {
                 '/home': (context) => const MyHomePage(title: '1RM Calculator'),
                 '/settings': (context) => const SettingsPage(title: 'Settings'),
+                '/inventory': (context) => const InventoryPage(),
               },
             ));
   }

@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         final plateProvider = Provider.of<PlateProvider>(context, listen: false);
 
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: false, // Prevents keyboard from crushing the UI
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             backgroundColor: const Color(0xFF2C363F),
@@ -63,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -114,11 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               printSnackBar("Calculations are more accurate in 1-6 rep range", context);
                             }
 
-                            // 1. Calculate the Max
                             calculatorProvider.calculate(weightValue, repsValue, formulaProvider.formula!,
                                 roundWeightStatus.getRoundStatus(), roundWeightValue.getRoundValue());
 
-                            // 2. Load the Barbell
                             double finalMax = double.parse(calculatorProvider.estimatedMax);
                             plateProvider.calculatePlates(finalMax, unitProvider.unit);
                           }
@@ -126,9 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text('Calculate', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(height: 24),
-
-                    // --- EXTRACTED COMPONENTS ---
+                    const SizedBox(height: 32),
                     const ResultCard(),
                     const SizedBox(height: 32),
                     const BarbellVisualizer(),
