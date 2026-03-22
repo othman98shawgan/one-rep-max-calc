@@ -1,21 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:in_app_review/in_app_review.dart';
-
-import 'package:one_rep_max_calc/service/formula_service.dart';
-import 'package:one_rep_max_calc/service/theme_service.dart';
-import 'package:one_rep_max_calc/service/unit_service.dart';
 import 'package:provider/provider.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../service/calculator_provider.dart';
-import '../service/utils.dart';
+import '../service/formula_service.dart';
+import '../service/plate_provider.dart';
 import '../service/round_to_service.dart';
+import '../service/unit_service.dart';
+import '../service/utils.dart';
+import '../service/app_services.dart';
+import 'widgets/barbell_visualizer.dart';
+import 'widgets/result_card.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -26,218 +23,161 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController weight = TextEditingController(text: "");
   final TextEditingController reps = TextEditingController(text: "");
   final _formKey = GlobalKey<FormState>();
-  final InAppReview inAppReview = InAppReview.instance;
-  String res = "1RM";
 
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable();
-    if (!kDebugMode) {
-      checkForUpdate();
-      checkForReview();
-    }
+    // All that messy store logic is now a single, clean line.
+    AppServices.initializeAppServices(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Full screen width and height
-    double height = MediaQuery.of(context).size.height;
+    return Consumer3<RoundNotifier, RoundValueNotifier, UnitNotifier>(
+      builder: (context, roundWeightStatus, roundWeightValue, unitProvider, child) {
+        final calculatorProvider = Provider.of<CalculatorProvider>(context, listen: false);
+        final formulaProvider = Provider.of<FormulaNotifier>(context, listen: false);
+        final plateProvider = Provider.of<PlateProvider>(context, listen: false);
 
-    // Height (without SafeArea)
-    var padding = MediaQuery.of(context).viewPadding;
-
-    // Height (without status and toolbar)
-    double height3 = height - padding.top - kToolbarHeight;
-
-    var flexSpaceSides = 2;
-    var flexSpacebetween = 1;
-    var flexTextFeild = 3;
-
-    return Consumer6<ThemeNotifier, RoundNotifier, RoundValueNotifier, UnitNotifier, FormulaNotifier,
-            CalculatorProvider>(
-        builder: (context, theme, roundWeightStatus, roundWeightValue, unitProvider, formulaProvider,
-                calculatorProvider, child) =>
-            Center(
-              child: Scaffold(
-                resizeToAvoidBottomInset: false,
-                appBar: AppBar(
-                  title: Text(widget.title),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      tooltip: 'Settings',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/settings').then((value) {
-                          calculatorProvider.reset();
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        });
-                        weight.clear();
-                        reps.clear();
-                      },
-                    ),
-                  ],
-                ),
-                body: Center(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      // mainAxisSize: MainAxisSize.min, //So elements be in Center
+        return Scaffold(
+          resizeToAvoidBottomInset: false, // Prevents keyboard from crushing the UI
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF2C363F),
+            foregroundColor: Colors.white,
+            elevation: 4,
+            title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings').then((_) {
+                    calculatorProvider.reset();
+                    plateProvider.reset();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  });
+                  weight.clear();
+                  reps.clear();
+                },
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // --- THE INPUTS ---
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: height3 * 0.15),
-                        Row(
-                          children: [
-                            Expanded(flex: flexSpaceSides, child: const SizedBox()),
-                            Expanded(
-                              flex: flexTextFeild,
-                              child: SizedBox(
-                                height: 80,
-                                child: TextFormField(
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  validator: weightValidator,
-                                  controller: weight,
-                                  obscureText: false,
-                                  decoration: const InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.blueGrey,
-                                      ),
-                                    ),
-                                    hintText: "Weight",
-                                    border: OutlineInputBorder(),
-                                    errorStyle: TextStyle(height: 0.5),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Expanded(flex: flexSpacebetween, child: const SizedBox()),
-                            Expanded(
-                              flex: flexTextFeild,
-                              child: SizedBox(
-                                height: 80,
-                                child: TextFormField(
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  validator: repsValidator,
-                                  controller: reps,
-                                  obscureText: false,
-                                  decoration: const InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.blueGrey,
-                                      ),
-                                    ),
-                                    hintText: "Reps",
-                                    border: OutlineInputBorder(),
-                                    errorStyle: TextStyle(
-                                      height: 0.5,
-                                    ),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Expanded(flex: flexSpaceSides, child: const SizedBox()),
-                          ],
+                        Expanded(
+                          child: _buildInputField(
+                            controller: weight,
+                            label: "Weight (${unitProvider.unit.toLowerCase()})",
+                            validator: (v) => v == null || v.isEmpty ? 'Missing value' : null,
+                          ),
                         ),
-                        SizedBox(height: height3 * 0.05),
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueGrey,
-                            ),
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              if (_formKey.currentState!.validate()) {
-                                var weightValue = double.parse(weight.text);
-                                var repsValue = int.parse(reps.text);
-
-                                // Keep the UI logic (SnackBar) in the UI
-                                if (repsValue > 6) {
-                                  printSnackBar("Calculations are more accurate in 1-6 rep range", context);
-                                }
-
-                                // Send the math to the logic layer
-                                Provider.of<CalculatorProvider>(context, listen: false).calculate(
-                                    weightValue,
-                                    repsValue,
-                                    formulaProvider.formula!,
-                                    roundWeightStatus.getRoundStatus(),
-                                    roundWeightValue.getRoundValue());
-                              }
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text('Calculate',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                  )),
-                            )),
-                        SizedBox(height: height3 * 0.075),
-                        Text(
-                          calculatorProvider.estimatedMax == '1RM'
-                              ? calculatorProvider.estimatedMax
-                              : '${calculatorProvider.estimatedMax} ${unitProvider.unit}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 48),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildInputField(
+                            controller: reps,
+                            label: "Reps",
+                            validator: (v) => v == null || v.isEmpty ? 'Missing value' : null,
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 32),
+
+                    // --- THE BUTTON ---
+                    SizedBox(
+                      width: 320,
+                      height: 56,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                        ),
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          if (_formKey.currentState!.validate()) {
+                            var weightValue = double.parse(weight.text);
+                            var repsValue = int.parse(reps.text);
+
+                            if (repsValue > 6) {
+                              printSnackBar("Calculations are more accurate in 1-6 rep range", context);
+                            }
+
+                            calculatorProvider.calculate(weightValue, repsValue, formulaProvider.formula!,
+                                roundWeightStatus.getRoundStatus(), roundWeightValue.getRoundValue());
+
+                            double finalMax = double.parse(calculatorProvider.estimatedMax);
+                            plateProvider.calculatePlates(finalMax, unitProvider.unit);
+                          }
+                        },
+                        child: const Text('Calculate', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    const ResultCard(),
+                    const SizedBox(height: 32),
+                    const BarbellVisualizer(),
+                  ],
                 ),
               ),
-            ));
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  String? weightValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Missing value';
-    }
-    return null;
-  }
-
-  String? repsValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Missing value';
-    }
-    return null;
-  }
-
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-        InAppUpdate.startFlexibleUpdate().then((_) {
-          InAppUpdate.completeFlexibleUpdate().then((_) {
-            if (kDebugMode) {
-              printSnackBar("Success!", context);
-            }
-          }).catchError((e) {
-            if (kDebugMode) {
-              printSnackBar(e.toString(), context);
-            }
-          });
-        }).catchError((e) {
-          if (kDebugMode) {
-            printSnackBar(e.toString(), context);
-          }
-        });
-      }
-    }).catchError((e) {
-      if (kDebugMode) {
-        printSnackBar(e.toString(), context);
-      }
-    });
-  }
-
-  Future<void> checkForReview() async {
-    inAppReview.isAvailable().then((isAvailable) {
-      if (isAvailable) {
-        inAppReview.requestReview();
-      }
-    });
+  // A clean helper method for the repetitive TextFormField code
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String? Function(String?) validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(fontSize: 18),
+          decoration: InputDecoration(
+            hintText: "0",
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            enabledBorder: const UnderlineInputBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+              borderSide: BorderSide(color: Color(0xFF4A5568), width: 2),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+              borderSide: BorderSide(color: Color(0xFF2C363F), width: 2),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
