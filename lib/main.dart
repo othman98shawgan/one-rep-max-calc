@@ -19,7 +19,7 @@ void main() {
     var prefs = value;
 
     //Theme
-    var isDark = StorageManager.readDataFromPrefs('isDark', prefs) ?? true;
+    var isDark = StorageManager.readDataFromPrefs('isDark', prefs) ?? false;
     ThemeMode themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
 
     runApp(

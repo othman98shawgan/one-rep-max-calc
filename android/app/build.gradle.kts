@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.one_rep_max_calc"
+    namespace = "com.app.a1rmcalc"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.one_rep_max_calc"
+        applicationId = "com.app.a1rmcalc"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
