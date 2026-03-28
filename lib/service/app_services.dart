@@ -30,13 +30,14 @@ class AppServices {
   static Future<void> checkForReview() async {
     const String calcCountKey = 'calculation_count_for_review';
     int calcCount = await StorageManager.readData(calcCountKey) ?? 0;
-    
+
     calcCount++;
     StorageManager.saveData(calcCountKey, calcCount);
 
-    if (calcCount == 3 || calcCount == 15 || calcCount == 50) {
+    // Prompt at 3, 15, and then every 30 calculations
+    if (calcCount == 3 || calcCount == 15 || (calcCount > 15 && calcCount % 30 == 0)) {
       final inAppReview = InAppReview.instance;
-      if (await inAppReview.isAvailable() && !kDebugMode) {
+      if (await inAppReview.isAvailable()) {
         inAppReview.requestReview();
       }
     }
