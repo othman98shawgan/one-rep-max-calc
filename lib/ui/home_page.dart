@@ -28,7 +28,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     // All that messy store logic is now a single, clean line.
-    AppServices.initializeAppServices(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppServices.initializeAppServices(context);
+    });
   }
 
   @override
@@ -119,6 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
                             double finalMax = double.parse(calculatorProvider.estimatedMax);
                             plateProvider.calculatePlates(finalMax, unitProvider.unit);
+                            
+                            AppServices.checkForReview();
                           }
                         },
                         child: const Text('Calculate', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

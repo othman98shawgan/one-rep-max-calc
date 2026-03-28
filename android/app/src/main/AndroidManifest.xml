@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
-        android:label="one_rep_max_calc"
+        android:label="1RM Calculator"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'store_manager.dart';
 
 class RoundNotifier with ChangeNotifier {
-  bool _roundStatus = false;
+  bool _roundStatus = true;
   bool getRoundStatus() => _roundStatus;
 
   RoundNotifier() {
     StorageManager.readData('roundStatus').then((value) {
-      _roundStatus = value ?? false;
+      _roundStatus = value ?? true;
       notifyListeners();
     });
   }
@@ -82,8 +82,7 @@ showRoundToDialog(BuildContext context, double roundValue) async {
                 RadioListTile(
                   contentPadding: EdgeInsets.zero,
                   visualDensity: const VisualDensity(
-                      horizontal: VisualDensity.minimumDensity,
-                      vertical: VisualDensity.minimumDensity),
+                      horizontal: VisualDensity.minimumDensity, vertical: VisualDensity.minimumDensity),
                   title: isKg ? const Text('2.5 KG') : const Text('5.0 LBS'),
                   value: isKg ? 2.5 : 5.0,
                   groupValue: currentRoundValue,
@@ -96,8 +95,7 @@ showRoundToDialog(BuildContext context, double roundValue) async {
                 RadioListTile(
                   contentPadding: EdgeInsets.zero,
                   visualDensity: const VisualDensity(
-                      horizontal: VisualDensity.minimumDensity,
-                      vertical: VisualDensity.minimumDensity),
+                      horizontal: VisualDensity.minimumDensity, vertical: VisualDensity.minimumDensity),
                   title: isKg ? const Text('5.0 KG') : const Text('10.0 LBS'),
                   value: isKg ? 5.0 : 10.0,
                   groupValue: currentRoundValue,

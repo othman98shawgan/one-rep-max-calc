@@ -1,4 +1,4 @@
-package com.example.one_rep_max_calc
+package com.app.a1rmcalc
 
 import io.flutter.embedding.android.FlutterActivity
 

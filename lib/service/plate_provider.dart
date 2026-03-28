@@ -45,17 +45,16 @@ class PlateProvider with ChangeNotifier {
   Future<void> _loadInventoryFromStorage() async {
     // 1. Fetch the barbell preference
     var savedBar = await StorageManager.readData('is_standard_bar');
-    if (savedBar != null) {
-      bool isStandard = savedBar as bool;
-      _barWeightKgs = isStandard ? 20.0 : 15.0;
-      _barWeightLbs = isStandard ? 45.0 : 35.0;
+    if (savedBar is bool) {
+      _barWeightKgs = savedBar ? 20.0 : 15.0;
+      _barWeightLbs = savedBar ? 45.0 : 35.0;
     }
 
     // 2. Fetch the plate pairs dynamically using their KG weight as the key
     for (var plate in inventory) {
       var savedPairs = await StorageManager.readData('plate_${plate.weightKgs}_pairs');
-      if (savedPairs != null) {
-        plate.availablePairs = savedPairs as int;
+      if (savedPairs is int) {
+        plate.availablePairs = savedPairs;
       }
     }
     notifyListeners();
