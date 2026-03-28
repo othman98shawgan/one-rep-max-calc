@@ -20,9 +20,11 @@ class AppServices {
       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
         await InAppUpdate.startFlexibleUpdate();
         await InAppUpdate.completeFlexibleUpdate();
+        if (!context.mounted) return;
         if (kDebugMode) printSnackBar("Success!", context);
       }
     } catch (e) {
+      if (!context.mounted) return;
       if (kDebugMode) printSnackBar(e.toString(), context);
     }
   }

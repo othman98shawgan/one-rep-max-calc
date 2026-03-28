@@ -28,7 +28,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     // All that messy store logic is now a single, clean line.
-    AppServices.initializeAppServices(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppServices.initializeAppServices(context);
+    });
   }
 
   @override
