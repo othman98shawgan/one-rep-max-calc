@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'store_manager.dart';
 import 'utils.dart';
 
 class AppServices {
@@ -10,7 +11,6 @@ class AppServices {
     WakelockPlus.enable();
     if (!kDebugMode) {
       _checkForUpdate(context);
-      _checkForReview();
     }
   }
 
@@ -27,10 +27,18 @@ class AppServices {
     }
   }
 
-  static Future<void> _checkForReview() async {
-    final inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
+  static Future<void> checkForReview() async {
+    const String calcCountKey = 'calculation_count_for_review';
+    int calcCount = await StorageManager.readData(calcCountKey) ?? 0;
+    
+    calcCount++;
+    StorageManager.saveData(calcCountKey, calcCount);
+
+    if (calcCount == 3 || calcCount == 15 || calcCount == 50) {
+      final inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable() && !kDebugMode) {
+        inAppReview.requestReview();
+      }
     }
   }
 }

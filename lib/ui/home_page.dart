@@ -119,6 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
                             double finalMax = double.parse(calculatorProvider.estimatedMax);
                             plateProvider.calculatePlates(finalMax, unitProvider.unit);
+                            
+                            AppServices.checkForReview();
                           }
                         },
                         child: const Text('Calculate', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
