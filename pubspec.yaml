@@ -3,7 +3,7 @@ description: 1 Rep Max Calculator is an app that lets you calculate your 1RM, an
 
 publish_to: 'none' 
 
-version: 4.2.0+7
+version: 4.2.1+8
 
 environment:
   sdk: '^3.2.0' # Welcome to Dart 3. Do not go back.
